@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-namespace Rubycone.BoltAction {
+namespace Rubycone.Folders {
     [DisallowMultipleComponent]
     public class Note : MonoBehaviour {
         [SerializeField]

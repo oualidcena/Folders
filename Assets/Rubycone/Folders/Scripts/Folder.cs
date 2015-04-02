@@ -2,8 +2,9 @@
 using System.Collections;
 using System.Linq;
 using System.Collections.Generic;
+using System.Text;
 
-namespace Rubycone.BoltAction {
+namespace Rubycone.Folders {
     [ExecuteInEditMode]
     [DisallowMultipleComponent]
     public class Folder : MonoBehaviour {
@@ -18,6 +19,11 @@ namespace Rubycone.BoltAction {
         [SerializeField]
         Color _folderColor = new Color(1f, 1f, 0f, 1f);
 
+        public string path { get; private set; }
+
+        Transform oldParent = null;
+
+
         public Color folderColor {
             get {
                 if(transform.root == transform) {
@@ -27,6 +33,12 @@ namespace Rubycone.BoltAction {
                     return transform.root.gameObject.GetAsFolder().folderColor;
                 }
             }
+        }
+
+
+
+        void Awake() {
+            RecalculatePath();
         }
 
         void Update() {
@@ -82,19 +94,46 @@ namespace Rubycone.BoltAction {
         }
 
         void OnTransformParentChanged() {
+            if(transform.parent == oldParent) {
+                return;
+            }
+            RecalculatePath();
             if(transform.parent != null) {
-                if(transform.parent.gameObject.GetAsFolder() != null) {
+                if(transform.parent.gameObject.GetAsFolder() == null) {
                     transform.parent = null;
                 }
+                else {
+                    transform.SetAsFirstSibling();
+                }
             }
+
+            oldParent = transform.parent;
         }
 
-        void OnTransformChildrenChanged() {
-
+        private void RecalculatePath() {
+            path = string.Empty;
+            var sb = new StringBuilder("/");
+            var parents = transform.GetParents();
+            var names = parents.Reverse().Select(s => s.name).ToArray();
+            foreach(var p in names) {
+                sb.Append(p + '/');
+            }
+            sb.Append(name);
+            path = sb.ToString();
         }
     }
 
     public static class FolderUtils {
+        public static Transform[] GetParents(this Transform transform) {
+            var list = new List<Transform>();
+            var pointer = transform;
+            while(pointer.parent != null) {
+                list.Add(pointer.parent);
+                pointer = pointer.parent;
+            }
+            return list.ToArray();
+        }
+
         public static Folder GetAsFolder(this GameObject g) {
             if(g == null) {
                 return null;

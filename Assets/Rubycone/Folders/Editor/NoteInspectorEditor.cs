@@ -2,8 +2,9 @@
 using System.Collections;
 using UnityEditor;
 
-namespace Rubycone.BoltAction {
+namespace Rubycone.Folders {
     [CustomEditor(typeof(Note))]
+    [CanEditMultipleObjects]
     public class NoteInspectorEditor : Editor {
         SerializedProperty text, resolveBeforeBuild;
         Vector2 scroll = Vector2.zero;

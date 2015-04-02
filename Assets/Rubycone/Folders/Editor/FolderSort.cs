@@ -2,8 +2,10 @@
 using System.Collections;
 using UnityEditor;
 
-namespace Rubycone.BoltAction {
+namespace Rubycone.Folders {
     public class FolderSort : BaseHierarchySort {
+
+        TransformSort defSort;
 
         public override GUIContent content {
             get {
@@ -22,7 +24,10 @@ namespace Rubycone.BoltAction {
                 return 1;
             }
             else {
-                return lhs.transform.GetSiblingIndex() > rhs.transform.GetSiblingIndex() ? 1 : -1;
+                if(defSort == null) {
+                    defSort = new TransformSort();
+                }
+                return defSort.Compare(lhs, rhs);
             }
         }
     }

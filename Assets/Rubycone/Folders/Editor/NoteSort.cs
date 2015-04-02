@@ -2,12 +2,12 @@
 using System.Collections;
 using UnityEditor;
 
-namespace Rubycone.BoltAction {
+namespace Rubycone.Folders {
     public class NoteSort : BaseHierarchySort {
 
         public override GUIContent content {
             get {
-                return new GUIContent(AssetDatabase.LoadAssetAtPath(NoteHierarchyEditor.GREY_ICON_16, typeof(Texture2D)) as Texture2D, "Note First Order");
+                return new GUIContent(AssetDatabase.LoadAssetAtPath(NoteHierarchyEditor.ICON_16, typeof(Texture2D)) as Texture2D, "Note First Order");
             }
         }
 

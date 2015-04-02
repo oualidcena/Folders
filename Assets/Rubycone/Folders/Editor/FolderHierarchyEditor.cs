@@ -2,8 +2,9 @@
 using System.Collections;
 using UnityEditor;
 using System;
+using Rubycone.Shared;
 
-namespace Rubycone.BoltAction {
+namespace Rubycone.Folders {
     [InitializeOnLoad]
     public static class FolderHierarchyEditor {
 
@@ -12,14 +13,12 @@ namespace Rubycone.BoltAction {
         public const string ICON_16 = "Assets/Gizmos/folder_icon_16.png";
         public const string ICON_32 = "Assets/Gizmos/folder_icon_32.png";
 
-        static Color oldEditorColor;
         static Color highlightColor = new Color(1f, 1f, 0f, 0.2f);
 
 
         static FolderHierarchyEditor() {
             // Init
             hFolder = LoadTex(ICON_16);
-            oldEditorColor = GUI.color;
 
             EditorApplication.hierarchyWindowItemOnGUI += OnHierarchyGUI;
         }
@@ -33,7 +32,7 @@ namespace Rubycone.BoltAction {
 
             if(folder != null) {
                 var parentCount = GetParentCount(folder.transform);
-                if(!Selection.Contains(folder.gameObject)) {
+                if(!Selection.Contains(instanceID)) {
                     DrawColoredBackground(selectionRect, folder);
                 }
                 DrawFolderIcon(selectionRect, folder, parentCount);
@@ -43,15 +42,15 @@ namespace Rubycone.BoltAction {
         private static void DrawColoredBackground(Rect selectionRect, Folder folder) {
             var color = folder.folderColor;
             color.a = 0.3f;
-            SaveGUIColor(color);
+            EditorGUIHelper.SaveGUIColor(color);
             GUI.Box(selectionRect, string.Empty);
-            RestoreGUIColor();
+            EditorGUIHelper.RestoreGUIColor();
         }
 
         private static void DrawFolderIcon(Rect selectionRect, Folder folder, int parentCount) {
             var color = folder.folderColor;
             color.a = 1f;
-            SaveGUIColor(color);
+            EditorGUIHelper.SaveGUIColor(color);
 
             var folderIconRect = new Rect(selectionRect);
 
@@ -66,17 +65,10 @@ namespace Rubycone.BoltAction {
             folderIconRect.width = 20;
 
             GUI.Label(folderIconRect, hFolder);
-            RestoreGUIColor();
+            EditorGUIHelper.RestoreGUIColor();
         }
 
-        private static void SaveGUIColor(Color newColor) {
-            oldEditorColor = GUI.color;
-            GUI.color = newColor;
-        }
 
-        private static void RestoreGUIColor() {
-            GUI.color = oldEditorColor;
-        }
 
         private static int GetParentCount(Transform transform) {
             var count = 0;
@@ -88,12 +80,16 @@ namespace Rubycone.BoltAction {
             return count;
         }
 
-        [MenuItem("GameObject/Folder", false, int.MinValue)]
-        public static void AddFolder() {
+        [MenuItem("GameObject/Create Folder", false, int.MinValue)]
+        public static void AddFolder(MenuCommand cmd) {
+
             var selection = Selection.activeTransform;
             var obj = new GameObject("New Folder");
             obj.AddComponent<Folder>();
-            obj.transform.parent = selection;
+
+            GameObjectUtility.SetParentAndAlign(obj, cmd.context as GameObject);
+            Undo.RegisterCreatedObjectUndo(obj, "Created " + obj.name);
+            Selection.activeGameObject = obj;
         }
     }
 }
