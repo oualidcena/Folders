@@ -28,8 +28,9 @@ namespace Rubycone.Folders {
 
             EditorGUILayout.Space();
             EditorGUILayout.LabelField("Settings", EditorStyles.boldLabel);
+            GUI.enabled = false;
             EditorGUILayout.PropertyField(resolveBeforeBuild);
-
+            GUI.enabled = true;
 
             EditorGUILayout.Space();
             EditorGUILayout.LabelField("Note Text", EditorStyles.boldLabel);

@@ -8,19 +8,15 @@ namespace Rubycone.Folders {
     [InitializeOnLoad]
     public static class NoteHierarchyEditor {
 
-        static Texture2D hNote, hNoteGrey;
+        static Texture2D hNote16;
 
-        public const string ICON_16 = "Assets/Gizmos/note_16.png";
+        public const string ICON_16 = "Assets/Rubycone/Folders/Resources/note_16.png";
 
         static NoteHierarchyEditor() {
             // Init
-            hNote = LoadTex(ICON_16);
+            hNote16 = Resources.LoadAssetAtPath<Texture2D>(ICON_16);
 
             EditorApplication.hierarchyWindowItemOnGUI += OnHierarchyGUI;
-        }
-
-        private static Texture2D LoadTex(string path) {
-            return AssetDatabase.LoadAssetAtPath(path, typeof(Texture2D)) as Texture2D;
         }
 
         private static Transform[] GetParents(Transform transform) {
@@ -44,7 +40,7 @@ namespace Rubycone.Folders {
             if(note != null || obj.GetComponentInChildren<Note>() != null) {
                 var parents = GetParents(obj.transform);
                 var noteIconRect = new Rect(selectionRect);
-                noteIconRect.x = (selectionRect.width - 24) + (parents.Length * 14);
+                noteIconRect.x = (selectionRect.width - 18) + (parents.Length * 14);
                 noteIconRect.width = 20;
 
                 var maxCharacters = 200;
@@ -58,8 +54,9 @@ namespace Rubycone.Folders {
                     EditorGUIHelper.SaveGUIColor(new Color(1f, 1f, 1f, 0.4f));
                 }
 
-                if(GUI.Button(noteIconRect, new GUIContent(hNote, text), GUIStyle.none) && note == null) {
+                if(GUI.Button(noteIconRect, new GUIContent(hNote16, text), GUIStyle.none) && note == null) {
                     Selection.activeObject = obj.GetComponentInChildren<Note>();
+                    EditorGUIUtility.PingObject(Selection.activeObject);
                 }
 
                 if(note == null) {

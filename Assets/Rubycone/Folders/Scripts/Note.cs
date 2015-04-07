@@ -2,6 +2,7 @@
 using System.Collections;
 
 namespace Rubycone.Folders {
+    [ExecuteInEditMode]
     [DisallowMultipleComponent]
     public class Note : MonoBehaviour {
         [SerializeField]
@@ -12,10 +13,12 @@ namespace Rubycone.Folders {
         public bool resolveBeforeBuild { get { return _resolveBeforeBuild; } }
         public string text { get { return _text; } }
 
-        void Awake() {
-            if(Application.isEditor == false) {
-                Destroy(this);
-            }
+        void Update() {
+            hideFlags = HideFlags.DontSaveInBuild;
+        }
+
+        void OnDisable() {
+            enabled = true;
         }
     }
 

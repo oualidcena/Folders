@@ -8,23 +8,17 @@ namespace Rubycone.Folders {
     [InitializeOnLoad]
     public static class FolderHierarchyEditor {
 
-        static Texture2D hFolder;
-
-        public const string ICON_16 = "Assets/Gizmos/folder_icon_16.png";
-        public const string ICON_32 = "Assets/Gizmos/folder_icon_32.png";
-
+        static Texture2D hFolder16;
         static Color highlightColor = new Color(1f, 1f, 0f, 0.2f);
+
+        const string ICON_16 = "Assets/Rubycone/Folders/Resources/folder_icon_16.png";
 
 
         static FolderHierarchyEditor() {
             // Init
-            hFolder = LoadTex(ICON_16);
+            hFolder16 = Resources.LoadAssetAtPath<Texture2D>(ICON_16);
 
             EditorApplication.hierarchyWindowItemOnGUI += OnHierarchyGUI;
-        }
-
-        private static Texture2D LoadTex(string path) {
-            return AssetDatabase.LoadAssetAtPath(path, typeof(Texture2D)) as Texture2D;
         }
 
         private static void OnHierarchyGUI(int instanceID, Rect selectionRect) {
@@ -64,7 +58,7 @@ namespace Rubycone.Folders {
 
             folderIconRect.width = 20;
 
-            GUI.Label(folderIconRect, hFolder);
+            GUI.Label(folderIconRect, hFolder16);
             EditorGUIHelper.RestoreGUIColor();
         }
 

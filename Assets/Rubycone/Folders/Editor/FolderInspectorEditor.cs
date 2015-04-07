@@ -11,8 +11,6 @@ namespace Rubycone.Folders {
         static Transform transform;
         Vector2 scroll;
 
-        public const string ICON = "Assets/Gizmos/folder_icon.png";
-
         private const string FOLDER_HELP = "Folders are zero centered, zero rotated and non-scaled GameObjects that can only store other objects as children. No other components may be added to this object, and the transform cannot be changed, either in the Editor or at runtime.";
 
         static Tool lastTool;
@@ -21,7 +19,6 @@ namespace Rubycone.Folders {
             transform = (target as Folder).transform;
             folderColor = serializedObject.FindProperty("_folderColor");
             drawMode = serializedObject.FindProperty("_drawMode");
-            folderDrawMode = serializedObject.FindProperty("_folderDrawMode");
             labelDrawMode = serializedObject.FindProperty("_labelDrawMode");
 
 
@@ -55,14 +52,13 @@ namespace Rubycone.Folders {
             EditorGUILayout.Space();
             EditorGUILayout.LabelField("Settings", EditorStyles.boldLabel);
             EditorGUILayout.PropertyField(drawMode);
-            EditorGUILayout.PropertyField(folderDrawMode);
             EditorGUILayout.PropertyField(labelDrawMode);
 
-            EditorGUILayout.Space();
-            EditorGUILayout.LabelField("Global Actions", EditorStyles.boldLabel);
-            if(GUILayout.Button("Alphabetize Folders")) {
+            //EditorGUILayout.Space();
+            //EditorGUILayout.LabelField("Global Actions", EditorStyles.boldLabel);
+            //if(GUILayout.Button("Alphabetize Folders")) {
 
-            }
+            //}
 
             serializedObject.ApplyModifiedProperties();
         }

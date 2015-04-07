@@ -6,10 +6,11 @@ namespace Rubycone.Folders {
     public class FolderSort : BaseHierarchySort {
 
         TransformSort defSort;
+        const string ICON_32 = "Assets/Rubycone/Folders/Resources/folder_icon_32.png";
 
         public override GUIContent content {
             get {
-                return new GUIContent(AssetDatabase.LoadAssetAtPath(FolderHierarchyEditor.ICON_16, typeof(Texture2D)) as Texture2D, "Folder First Order");
+                return new GUIContent(Resources.LoadAssetAtPath<Texture2D>(ICON_32), "Folder First Order");
             }
         }
 

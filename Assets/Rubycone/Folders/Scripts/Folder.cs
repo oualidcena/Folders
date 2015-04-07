@@ -3,6 +3,8 @@ using System.Collections;
 using System.Linq;
 using System.Collections.Generic;
 using System.Text;
+using System.Diagnostics;
+using System;
 
 namespace Rubycone.Folders {
     [ExecuteInEditMode]
@@ -12,17 +14,15 @@ namespace Rubycone.Folders {
         public enum TwoWayDrawMode { DontShow, OnSelected }
 
         [SerializeField]
-        ThreeWayDrawMode _drawMode       = ThreeWayDrawMode.OnSelected,
-                         _folderDrawMode = ThreeWayDrawMode.OnSelected;
+        ThreeWayDrawMode _drawMode = ThreeWayDrawMode.OnSelected;
         [SerializeField]
-        TwoWayDrawMode _labelDrawMode= TwoWayDrawMode.OnSelected;
+        TwoWayDrawMode _labelDrawMode = TwoWayDrawMode.OnSelected;
         [SerializeField]
         Color _folderColor = new Color(1f, 1f, 0f, 1f);
 
+        static Type[] invalidTypes;
+
         public string path { get; private set; }
-
-        Transform oldParent = null;
-
 
         public Color folderColor {
             get {
@@ -35,26 +35,37 @@ namespace Rubycone.Folders {
             }
         }
 
-
-
         void Awake() {
             RecalculatePath();
         }
 
         void Update() {
+            EnforceFolderBehaviours();
+        }
+
+        [Conditional("UNITY_EDITOR")]
+        void EnforceFolderBehaviours() {
+            if(invalidTypes == null) {
+                invalidTypes = new Type[]{
+                    typeof(Rigidbody),
+                    typeof(Rigidbody2D),
+                    typeof(Collider),
+                    typeof(ConstantForce),
+                    typeof(ConstantForce2D)
+                };
+            }
+
+            RecalculatePath();
             transform.hideFlags = HideFlags.HideInInspector | HideFlags.NotEditable;
             transform.position = Vector3.zero;
 
             var allComponents = GetComponents<Component>()
-                                .Where(c => c != this && c != transform && c.GetType() != typeof(Note))
+                                .Where(c => invalidTypes.Contains(c.GetType()))
                                 .ToArray();
 
-            if(allComponents.Length != 0) {
-                foreach(var c in allComponents) {
-                    DestroyImmediate(c);
-                }
+            foreach(var c in allComponents) {
+                DestroyImmediate(c);
             }
-
         }
 
         void OnDisable() {
@@ -62,25 +73,15 @@ namespace Rubycone.Folders {
         }
 
         public void OnDrawGizmos() {
-            if(_folderDrawMode == ThreeWayDrawMode.AlwaysShow) {
-                DrawFolderIcon();
-            }
             if(_drawMode == ThreeWayDrawMode.AlwaysShow) {
                 DrawConnections();
             }
         }
 
         public void OnDrawGizmosSelected() {
-            if(_folderDrawMode == ThreeWayDrawMode.OnSelected) {
-                DrawFolderIcon();
-            }
             if(_drawMode == ThreeWayDrawMode.OnSelected) {
                 DrawConnections();
             }
-        }
-
-        void DrawFolderIcon() {
-            Gizmos.DrawIcon(transform.position, "folder_icon_full", true);
         }
 
         void DrawConnections() {
@@ -94,20 +95,11 @@ namespace Rubycone.Folders {
         }
 
         void OnTransformParentChanged() {
-            if(transform.parent == oldParent) {
-                return;
-            }
-            RecalculatePath();
             if(transform.parent != null) {
                 if(transform.parent.gameObject.GetAsFolder() == null) {
                     transform.parent = null;
                 }
-                else {
-                    transform.SetAsFirstSibling();
-                }
             }
-
-            oldParent = transform.parent;
         }
 
         private void RecalculatePath() {
