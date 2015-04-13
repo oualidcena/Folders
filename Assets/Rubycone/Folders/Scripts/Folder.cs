@@ -14,11 +14,13 @@ namespace Rubycone.Folders {
         public enum TwoWayDrawMode { DontShow, OnSelected }
 
         [SerializeField]
-        ThreeWayDrawMode _drawMode = ThreeWayDrawMode.OnSelected;
+        ThreeWayDrawMode drawMode = ThreeWayDrawMode.OnSelected;
         [SerializeField]
-        TwoWayDrawMode _labelDrawMode = TwoWayDrawMode.OnSelected;
+        TwoWayDrawMode labelDrawMode = TwoWayDrawMode.OnSelected;
         [SerializeField]
         Color _folderColor = new Color(1f, 1f, 0f, 1f);
+        [SerializeField]
+        bool allowBrokenPath = false;
 
         static Type[] invalidTypes;
 
@@ -26,11 +28,11 @@ namespace Rubycone.Folders {
 
         public Color folderColor {
             get {
-                if(transform.root == transform) {
+                if(transform.parent == null || transform.parent.gameObject.GetAsFolder() == null) {
                     return _folderColor;
                 }
                 else {
-                    return transform.root.gameObject.GetAsFolder().folderColor;
+                    return transform.root.gameObject.GetAsFolder()._folderColor;
                 }
             }
         }
@@ -45,6 +47,9 @@ namespace Rubycone.Folders {
 
         [Conditional("UNITY_EDITOR")]
         void EnforceFolderBehaviours() {
+            if(!allowBrokenPath) {
+                OnTransformParentChanged();
+            }
             if(invalidTypes == null) {
                 invalidTypes = new Type[]{
                     typeof(Rigidbody),
@@ -73,13 +78,13 @@ namespace Rubycone.Folders {
         }
 
         public void OnDrawGizmos() {
-            if(_drawMode == ThreeWayDrawMode.AlwaysShow) {
+            if(drawMode == ThreeWayDrawMode.AlwaysShow) {
                 DrawConnections();
             }
         }
 
         public void OnDrawGizmosSelected() {
-            if(_drawMode == ThreeWayDrawMode.OnSelected) {
+            if(drawMode == ThreeWayDrawMode.OnSelected) {
                 DrawConnections();
             }
         }
@@ -95,7 +100,7 @@ namespace Rubycone.Folders {
         }
 
         void OnTransformParentChanged() {
-            if(transform.parent != null) {
+            if(!allowBrokenPath && transform.parent != null) {
                 if(transform.parent.gameObject.GetAsFolder() == null) {
                     transform.parent = null;
                 }
@@ -105,8 +110,8 @@ namespace Rubycone.Folders {
         private void RecalculatePath() {
             path = string.Empty;
             var sb = new StringBuilder("/");
-            var parents = transform.GetParents();
-            var names = parents.Reverse().Select(s => s.name).ToArray();
+            var parents = transform.GetParents().Where(t => t.gameObject.GetAsFolder() != null);
+            var names = parents.Reverse().Select(s => s.name);
             foreach(var p in names) {
                 sb.Append(p + '/');
             }

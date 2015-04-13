@@ -7,7 +7,7 @@ namespace Rubycone.Folders {
     [CustomEditor(typeof(Folder))]
     [CanEditMultipleObjects]
     public class FolderInspectorEditor : Editor {
-        static SerializedProperty drawMode, folderDrawMode, labelDrawMode, folderColor;
+        static SerializedProperty drawMode, folderDrawMode, labelDrawMode, folderColor, allowBrokenPath;
         static Transform transform;
         Vector2 scroll;
 
@@ -18,8 +18,9 @@ namespace Rubycone.Folders {
         void OnEnable() {
             transform = (target as Folder).transform;
             folderColor = serializedObject.FindProperty("_folderColor");
-            drawMode = serializedObject.FindProperty("_drawMode");
-            labelDrawMode = serializedObject.FindProperty("_labelDrawMode");
+            drawMode = serializedObject.FindProperty("drawMode");
+            labelDrawMode = serializedObject.FindProperty("labelDrawMode");
+            allowBrokenPath = serializedObject.FindProperty("allowBrokenPath");
 
 
             lastTool = Tools.current;
@@ -41,11 +42,12 @@ namespace Rubycone.Folders {
 
             EditorGUILayout.LabelField((target as Folder).path);
 
-            if(transform.parent == null) {
+            if(transform.parent == null || transform.parent.gameObject.GetAsFolder() == null) {
                 //Root folder settings
                 EditorGUILayout.Space();
                 EditorGUILayout.LabelField("Root Settings", EditorStyles.boldLabel);
                 EditorGUILayout.PropertyField(folderColor);
+                EditorGUILayout.PropertyField(allowBrokenPath);
             }
 
             //Draw settings
